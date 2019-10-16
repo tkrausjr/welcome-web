@@ -23,6 +23,7 @@ then a GO Install inside the Container.
 
 
 ## Push the Image to a new Repository
+NOTE: This will require to have the CA Cert for the Registry to Root of Trust. IN PKS, you can copy the Opsman CA Cert to /etc/docker/certs.d/harbor.tpmlab.vmware.com/ca.crt   and restart docker daemon.
 * (Optional) Log in to new repository
   * docker login harbor.tpmlab.vmware.com -u admin
 * Tag the newly built image
@@ -32,18 +33,21 @@ then a GO Install inside the Container.
 
 ## Run the site in Kubernetes Cluster
 * Create a Deployment with the Image 
-  * kubectl run conference-app --replicas=2 --labels="run=conference-app" --image=tkrausjr/conference-app:latest --port=8080
+  * kubectl run welcome-web --replicas=2 --labels="run=welcome-web" --image=harbor.tpmlab.vmware.com/library/welcome-web:latest --port=8080
 * Create an externally accessible Service for the Deployment
-  * kubectl expose deployment conference-app --type=NodePort --name=conference-app
-* Get NodePort: Value  (Ex. 32449 )
-  * kubectl describe services conference-app
-* Get node name ( Ex. vm-c7d7773d-fd57-4efa-b8aa-14c405dde4cb)
-  * kubectl get nodes 
-* Get IP  (Ex. 10.190.64.71) 
-  * kubectl describe node vm-c7d7773d-fd57-4efa-b8aa-14c405dde4cb
-* Now you can test access at http://<ExternalIP>:<NodePort>
-  * Chrome http://10.190.64.71:32449
-  * curl http://10.190.64.71:32449
+  * kubectl expose deployment welcome-web --type=LoadBalancer --name=welcome-web
+* Get Deployment Status
+  * k get deploy
+  * NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+  * welcome-web   2/2     2            2           65s
+* Get Service LB EXTENRAL-IP  (Ex. 10.190.64.71) 
+  * kubectl get svc
+  * NAME              TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+  * kubernetes        ClusterIP      10.100.200.1     <none>        443/TCP          5d19h
+  * welcome-web       LoadBalancer   10.100.200.109   10.51.0.23    8080:32629/TCP   2m32s
+* Now you can test access at http://<EXTERNAL-IP>:8080
+  * Chrome 10.51.0.23:8080
+  * curl 10.51.0.23:8080
 
 ## Run the site locally right from the local REPO.
 * $ cd /Users/kraust/Documents/go-workspace/src/github/demo-app
@@ -53,6 +57,4 @@ then a GO Install inside the Container.
 * Note the PORT the server is Listening on:
 * Open Chrome and navigate to http://localhost:<port>  Defaults to :8080 
 
-## Update the Website Static Content
-The App will serve the contents of the /public folder so to make canges to the Website you would update the contents of the ./public folder. In this case we are using the Open Source product HUGO so we change our site settings in this repo (https://github.com/tkrausjr/my-conference) and the output is put in a ./public folder which we can move over to the go-http repo.
-* $ cp -R ./public ~/github/go-http/
+
