@@ -1,4 +1,4 @@
-# go-http
+# go-welcome-web
 
 # Simple HTTP Server using Go net/http module
 * Tested on OSX 10.12.6 and go 1.9
@@ -12,23 +12,23 @@ then a GO Install inside the Container.
 
 (Docker or Build Host)
 * Checkout the Repo.
-  * git clone https://github.com/tkrausjr/go-http.git
-  * cd ./go-http
+  * git clone https://github.com/tkrausjr/welcome-web.git
+  * cd ./welcome-web
 * Build the Go Binaries from Src.
-  * docker build -t conference-app .
+  * docker build -t welcome-web .
 * SHOW Build Output
   * docker images
 * Test Locally:
-  * docker run -p 8080:8080 --name="testing-conference-app:latest" -d conference-app
+  * docker run -p 8080:8080 --name="welcome-web-1" -d welcome-web:latest
 
 
 ## Push the Image to a new Repository
 * (Optional) Log in to new repository
-  * docker login 10.173.13.31 -u admin
+  * docker login harbor.tpmlab.vmware.com -u admin
 * Tag the newly built image
-  * docker tag conference-app:latest 10.173.13.31/conference/conference-app:latest
+  * docker tag welcome-web:latest harbor.tpmlab.vmware.com/library/welcome-web:latest
 * Push the newly built image.
-  * docker push 10.173.13.31/conference/conference-app:latest
+  * docker push harbor.tpmlab.vmware.com/library/welcome-web:latest
 
 ## Run the site in Kubernetes Cluster
 * Create a Deployment with the Image 
